@@ -7,15 +7,13 @@ app.get("/",(req, res)=>{
     res.render("index.ejs")
 })
 
-//list product
-app.get("/products", (req, res)=>{
+//product
+app.get("/produk", (req, res)=>{
     
 })
-app.get("/products/:id", (req, res) =>{  
+app.get("/produk/:id", (req, res) =>{  
 })
-app.get("/tentang", (req,res)=>{
-    
-})
-app.get("/api/products",(req,res)=>{
-  
-})
+
+//AI
+app.get("/tanya-ai")
+
