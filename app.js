@@ -126,3 +126,87 @@ const requireAuthAPI = (req, res, next) => {
     }
     next();
 };
+// EJS & Public Folder Setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'view'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Halaman Login (GET /login)
+app.get('/login', (req, res) => {
+    if (req.session.user) return res.redirect('/dashboard');
+    res.render('login');
+});
+
+// Endpoint Login (POST /api/login)
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === 'admin' && password === 'admin123') {
+        req.session.user = { username: 'admin', role: 'Kasir/Admin' };
+        return res.json({ status: "success", redirectUrl: "/dashboard" });
+    }
+    return res.status(401).json({ status: "error", message: "Username atau password salah!" });
+});
+
+// Fitur Logout (GET /logout)
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/login'));
+});
+
+
+// GET /api/products (Public Read All & Filter)
+app.get('/api/products', (req, res) => {
+    const { kategori, search } = req.query;
+    let filtered = products;
+    if (kategori) filtered = filtered.filter(p => p.category.toLowerCase() === kategori.toLowerCase());
+    if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+    res.json({ status: "success", total: filtered.length, data: filtered });
+});
+
+// GET /api/products/:id (Public Read Single)
+app.get('/api/products/:id', (req, res) => {
+    const p = products.find(p => p.id === parseInt(req.params.id));
+    if (!p) return res.status(404).json({ status: "error", message: "Produk tidak ditemukan" });
+    res.json({ status: "success", data: p });
+});
+
+// POST /api/products (Create - Protected API)
+app.post('/api/products', requireAuthAPI, (req, res) => {
+    const { name, category, price, stock, description, image } = req.body;
+    const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+    const newProduct = {
+        id: newId,
+        name: name.trim(),
+        category: category.trim(),
+        price: Number(price),
+        stock: Number(stock),
+        image: image || "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80",
+        description: description || "Produk sembako pilihan."
+    };
+    products.push(newProduct);
+    res.status(201).json({ status: "success", message: "Produk ditambahkan", data: newProduct });
+});
+
+// PUT /api/products/:id (Update - Protected API)
+app.put('/api/products/:id', requireAuthAPI, (req, res) => {
+    const idx = products.findIndex(p => p.id === parseInt(req.params.id));
+    if (idx === -1) return res.status(404).json({ status: "error", message: "Produk tidak ditemukan" });
+
+    const { name, category, price, stock, description, image } = req.body;
+    if (name) products[idx].name = name.trim();
+    if (category) products[idx].category = category.trim();
+    if (price !== undefined) products[idx].price = Number(price);
+    if (stock !== undefined) products[idx].stock = Number(stock);
+    if (description !== undefined) products[idx].description = description;
+    if (image !== undefined) products[idx].image = image;
+
+    res.json({ status: "success", message: "Produk diperbarui", data: products[idx] });
+});
+
+// DELETE /api/products/:id (Delete - Protected API)
+app.delete('/api/products/:id', requireAuthAPI, (req, res) => {
+    const idx = products.findIndex(p => p.id === parseInt(req.params.id));
+    if (idx === -1) return res.status(404).json({ status: "error", message: "Produk tidak ditemukan" });
+
+    const deleted = products.splice(idx, 1)[0];
+    res.json({ status: "success", message: "Produk dihapus", data: deleted });
+});
