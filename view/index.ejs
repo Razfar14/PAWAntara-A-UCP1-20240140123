@@ -1,0 +1,36 @@
+<%- include('partials/header', { title: 'Beranda - Toko Sembako Ibu Aries' }) %>
+<%- include('partials/navbar') %>
+
+<main>
+    <!-- Hero Section Semantik -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Sembako Segar & Lengkap Setiap Hari</h1>
+            <p class="hero-subtitle">Pilihan utama kebutuhan dapur rumah tangga dengan harga bersahabat.</p>
+            <div class="hero-buttons">
+                <a href="/produk" class="btn-white">Belanja Sekarang</a>
+                <a href="/tanya-ai" class="btn-emerald">Tanya AI</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preview Produk Section -->
+    <section class="container product-section">
+        <h2 class="section-title">Preview Produk Unggulan</h2>
+        <div class="product-grid">
+            <% featuredProducts.forEach(product => { %>
+                <article class="product-card">
+                    <img src="<%= product.image || 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' %>" alt="<%= product.name %>" class="product-image">
+                    <h3 class="product-name"><%= product.name %></h3>
+                    <p class="product-desc"><%= product.description || 'Produk sembako pilihan untuk keluarga.' %></p>
+                    <div class="product-card-footer">
+                        <span class="product-price">Rp <%= product.price.toLocaleString('id-ID') %></span>
+                        <a href="/produk/<%= product.id %>" class="btn-detail">Detail</a>
+                    </div>
+                </article>
+            <% }); %>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

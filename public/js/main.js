@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btn && menu) {
         btn.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
+            menu.classList.toggle('active');
             if (icon) {
                 icon.classList.toggle('fa-bars');
                 icon.classList.toggle('fa-xmark');

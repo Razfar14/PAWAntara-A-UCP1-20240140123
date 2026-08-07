@@ -1,0 +1,33 @@
+<%- include('partials/header', { title: 'Tanya AI Ibu Aries' }) %>
+<%- include('partials/navbar') %>
+
+<main class="container product-section">
+    <section style="background-color: #ffffff; border: 1px solid var(--slate-200); border-radius: 1rem; padding: 2rem; max-width: 48rem; margin: 0 auto;">
+        <h1 class="section-title" style="margin-bottom: 0.5rem;">Tanya Asisten AI Ibu Aries</h1>
+        <p style="color: var(--slate-500); font-size: 0.875rem; margin-bottom: 1.5rem;">Tanyakan tentang stok sembako, resep masakan, atau saran belanjaan.</p>
+
+        <!-- Form Aksesibel (Label terhubung ke Input Textarea) -->
+        <form action="#" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label for="user-prompt" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--slate-700); margin-bottom: 0.5rem;">
+                    Pertanyaan Anda
+                </label>
+                <textarea 
+                    id="user-prompt" 
+                    name="prompt" 
+                    rows="4" 
+                    placeholder="Contoh: Berapa harga beras premium 5kg hari ini?" 
+                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--slate-200); border-radius: 0.75rem; font-size: 0.875rem; font-family: inherit; outline: none;"
+                    required
+                ></textarea>
+            </div>
+            <div>
+                <button type="button" class="btn-emerald" style="opacity: 0.8; cursor: not-allowed;">
+                    Kirim Pertanyaan (Segera Hadir di Sprint 2)
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

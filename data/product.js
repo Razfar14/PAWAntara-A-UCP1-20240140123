@@ -44,4 +44,4 @@ const products = [
 
 ]
 
-module.exports = produk;
+module.exports = products;

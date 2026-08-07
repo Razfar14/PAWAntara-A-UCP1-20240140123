@@ -1,0 +1,40 @@
+<%- include('partials/header', { title: 'Katalog Produk - Toko Sembako Ibu Aries' }) %>
+<%- include('partials/navbar') %>
+
+<main class="container product-section">
+    <header class="filter-header">
+        <div>
+            <h1 class="section-title" style="margin-bottom: 0.25rem;">Katalog Sembako</h1>
+            <p style="color: var(--slate-500); font-size: 0.875rem;">Daftar produk lengkap Toko Ibu Aries</p>
+        </div>
+
+        <!-- Form Filter Query Server-Side (req.query) -->
+        <form action="/produk" method="GET" class="filter-form">
+            <input type="text" name="search" value="<%= searchQuery %>" placeholder="Cari produk..." class="filter-input">
+            <select name="kategori" class="filter-select">
+                <option value="">Semua Kategori</option>
+                <% categories.forEach(cat => { %>
+                    <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }); %>
+            </select>
+            <button type="submit" class="btn-emerald">Filter</button>
+        </form>
+    </header>
+
+    <div class="product-grid">
+        <% products.forEach(product => { %>
+            <article class="product-card">
+                <img src="<%= product.image || 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' %>" alt="<%= product.name %>" class="product-image">
+                <span class="category-badge"><%= product.category %></span>
+                <h2 class="product-name"><%= product.name %></h2>
+                <p class="product-desc"><%= product.description || 'Produk sembako kualitas terbaik.' %></p>
+                <div class="product-card-footer">
+                    <span class="product-price">Rp <%= product.price.toLocaleString('id-ID') %></span>
+                    <a href="/produk/<%= product.id %>" class="btn-detail">Detail</a>
+                </div>
+            </article>
+        <% }); %>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

@@ -1,26 +1,26 @@
-<header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-    <nav class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <a href="/" class="font-extrabold text-lg text-green-700 flex items-center gap-2">
+<header class="site-header">
+    <nav class="container nav-container">
+        <a href="/" class="brand-logo">
             <i class="fa-solid fa-store"></i> Toko Ibu Aries
         </a>
 
         <!-- Desktop Navigation -->
-        <ul class="hidden md:flex gap-6 font-medium text-sm">
-            <li><a href="/" class="hover:text-green-600">Beranda</a></li>
-            <li><a href="/produk" class="hover:text-green-600">Produk</a></li>
-            <li><a href="/tanya-ai" class="hover:text-green-600">Tanya AI</a></li>
+        <ul class="nav-links">
+            <li><a href="/">Beranda</a></li>
+            <li><a href="/produk">Produk</a></li>
+            <li><a href="/tanya-ai">Tanya AI</a></li>
         </ul>
 
         <!-- Mobile Hamburger Button -->
-        <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-600">
-            <i id="hamburger-icon" class="fa-solid fa-bars text-xl"></i>
+        <button id="mobile-menu-btn" class="hamburger-btn" aria-label="Menu Mobile">
+            <i id="hamburger-icon" class="fa-solid fa-bars"></i>
         </button>
     </nav>
 
     <!-- Mobile Navigation Dropdown -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 py-3 space-y-2">
-        <a href="/" class="block py-2 font-medium">Beranda</a>
-        <a href="/produk" class="block py-2 font-medium">Produk</a>
-        <a href="/tanya-ai" class="block py-2 font-medium">Tanya AI</a>
+    <div id="mobile-menu" class="mobile-dropdown">
+        <a href="/">Beranda</a>
+        <a href="/produk">Produk</a>
+        <a href="/tanya-ai">Tanya AI</a>
     </div>
 </header>
