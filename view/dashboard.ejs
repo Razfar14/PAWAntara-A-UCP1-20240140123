@@ -1,0 +1,292 @@
+<%- include('partials/header', { title: 'Dashboard Admin - Toko Sembako Ibu Aries' }) %>
+<%- include('partials/navbar') %>
+
+<main class="container product-section">
+    <header class="filter-header">
+        <div>
+            <h1 class="section-title" style="margin-bottom: 0.25rem;">Dashboard Manajemen Stok Produk</h1>
+            <p style="color: var(--slate-500); font-size: 0.875rem;">Kelola CRUD data sembako Ibu Aries secara realtime via REST API</p>
+        </div>
+
+        <button id="btn-open-add" class="btn-emerald">
+            <i class="fa-solid fa-plus"></i> Tambah Produk Sembako
+        </button>
+    </header>
+
+    <!-- Stat Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: #fff; border: 1px solid var(--slate-200); border-radius: 0.75rem; padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 2.75rem; height: 2.75rem; background: #d1fae5; color: #047857; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase;">Total Jenis Produk</div>
+                <div id="stat-total-products" style="font-size: 1.25rem; font-weight: 800; color: var(--slate-900);">0</div>
+            </div>
+        </div>
+
+        <div style="background: #fff; border: 1px solid var(--slate-200); border-radius: 0.75rem; padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 2.75rem; height: 2.75rem; background: #e0f2fe; color: #0369a1; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-cubes"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase;">Total Unit Stok</div>
+                <div id="stat-total-stock" style="font-size: 1.25rem; font-weight: 800; color: var(--slate-900);">0</div>
+            </div>
+        </div>
+
+        <div style="background: #fff; border: 1px solid var(--slate-200); border-radius: 0.75rem; padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 2.75rem; height: 2.75rem; background: #fef3c7; color: #b45309; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase;">Stok Menipis (≤15)</div>
+                <div id="stat-low-stock" style="font-size: 1.25rem; font-weight: 800; color: #b45309;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form Tambah / Edit Produk (Tanpa Input Gambar) -->
+    <div id="product-modal" style="display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background-color: #ffffff; border-radius: 1rem; padding: 2rem; width: 100%; max-width: 32rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--slate-200); padding-bottom: 0.75rem;">
+                <h2 id="modal-title" style="font-size: 1.25rem; font-weight: 700;">Tambah Produk Sembako</h2>
+                <button id="btn-close-modal" type="button" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--slate-500);">&times;</button>
+            </div>
+
+            <div id="modal-alert" style="display: none; background-color: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.5rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+            <form id="product-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                <input type="hidden" id="product-id" name="id">
+
+                <div>
+                    <label for="form-name" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Nama Produk *</label>
+                    <input type="text" id="form-name" required class="filter-input" placeholder="Contoh: Beras Super 5kg">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div>
+                        <label for="form-category" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Kategori *</label>
+                        <input type="text" id="form-category" required class="filter-input" placeholder="bahan pokok">
+                    </div>
+                    <div>
+                        <label for="form-price" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Harga (Rp) *</label>
+                        <input type="number" id="form-price" required min="0" class="filter-input" placeholder="10000">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="form-stock" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Jumlah Stok *</label>
+                    <input type="number" id="form-stock" required min="0" class="filter-input" placeholder="50">
+                </div>
+
+                <div>
+                    <label for="form-description" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Deskripsi Produk</label>
+                    <textarea id="form-description" rows="2" class="filter-input" placeholder="Penjelasan singkat produk..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+                    <button type="button" id="btn-cancel-modal" class="btn-detail">Batal</button>
+                    <button type="submit" class="btn-emerald">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Product Management (Tanpa Kolom Foto) -->
+    <div style="background-color: #ffffff; border: 1px solid var(--slate-200); border-radius: 1rem; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+            <thead>
+                <tr style="background-color: var(--slate-100); border-bottom: 1px solid var(--slate-200); color: var(--slate-700);">
+                    <th style="padding: 0.85rem 1rem;">ID</th>
+                    <th style="padding: 0.85rem 1rem;">Nama Produk</th>
+                    <th style="padding: 0.85rem 1rem;">Kategori</th>
+                    <th style="padding: 0.85rem 1rem;">Harga</th>
+                    <th style="padding: 0.85rem 1rem;">Stok</th>
+                    <th style="padding: 0.85rem 1rem; text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="dashboard-table-body">
+                <!-- Diisi secara dinamis dari REST API -->
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('product-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const btnOpenAdd = document.getElementById('btn-open-add');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const btnCancelModal = document.getElementById('btn-cancel-modal');
+    const productForm = document.getElementById('product-form');
+    const modalAlert = document.getElementById('modal-alert');
+    const tableBody = document.getElementById('dashboard-table-body');
+
+    // Stat element references
+    const statTotalProducts = document.getElementById('stat-total-products');
+    const statTotalStock = document.getElementById('stat-total-stock');
+    const statLowStock = document.getElementById('stat-low-stock');
+
+    // Function Load Products via REST API
+    async function loadProducts() {
+        try {
+            const res = await fetch('/api/products');
+            const result = await res.json();
+            
+            if (result.status === 'success') {
+                updateStats(result.data);
+                renderTable(result.data);
+            }
+        } catch (err) {
+            console.error('Error fetching products:', err);
+        }
+    }
+
+    function updateStats(products) {
+        if (!products) return;
+        statTotalProducts.textContent = products.length;
+        const totalStock = products.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
+        statTotalStock.textContent = totalStock;
+        const lowStockCount = products.filter(p => Number(p.stock) <= 15).length;
+        statLowStock.textContent = lowStockCount;
+    }
+
+    function renderTable(products) {
+        if (products.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--slate-500);">Belum ada data produk sembako.</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = products.map(p => `
+            <tr style="border-bottom: 1px solid var(--slate-100);">
+                <td style="padding: 0.85rem 1rem; font-weight: 700;">#${p.id}</td>
+                <td style="padding: 0.85rem 1rem; font-weight: 600; color: var(--slate-900);">
+                    <div style="text-transform: capitalize;">${p.name}</div>
+                    <div style="font-size: 0.75rem; color: var(--slate-500);">${p.description || ''}</div>
+                </td>
+                <td style="padding: 0.85rem 1rem;"><span class="category-badge">${p.category}</span></td>
+                <td style="padding: 0.85rem 1rem; font-weight: 700; color: var(--emerald-600);">Rp ${Number(p.price).toLocaleString('id-ID')}</td>
+                <td style="padding: 0.85rem 1rem;">
+                    <span style="font-weight: 700; color: ${p.stock > 15 ? 'var(--slate-800)' : '#dc2626'};">
+                        ${p.stock} unit ${p.stock <= 15 ? '<i class="fa-solid fa-triangle-exclamation text-xs ml-1" title="Stok Menipis"></i>' : ''}
+                    </span>
+                </td>
+                <td style="padding: 0.85rem 1rem; text-align: center;">
+                    <div style="display: flex; justify-content: center; gap: 0.35rem;">
+                        <button onclick="editProduct(${p.id})" class="btn-detail" style="background-color: #e0f2fe; color: #0369a1;"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                        <button onclick="deleteProduct(${p.id})" class="btn-detail" style="background-color: #fef2f2; color: #dc2626;"><i class="fa-solid fa-trash"></i> Hapus</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Open Add Modal
+    btnOpenAdd.addEventListener('click', () => {
+        productForm.reset();
+        document.getElementById('product-id').value = '';
+        modalTitle.textContent = 'Tambah Produk Sembako Baru';
+        modalAlert.style.display = 'none';
+        modal.style.display = 'flex';
+    });
+
+    const closeModal = () => modal.style.display = 'none';
+    btnCloseModal.addEventListener('click', closeModal);
+    btnCancelModal.addEventListener('click', closeModal);
+
+    // Edit Product Trigger (Fetch single product data)
+    window.editProduct = async (id) => {
+        try {
+            const res = await fetch(`/api/products/${id}`);
+            const result = await res.json();
+
+            if (result.status === 'success') {
+                const p = result.data;
+                document.getElementById('product-id').value = p.id;
+                document.getElementById('form-name').value = p.name;
+                document.getElementById('form-category').value = p.category;
+                document.getElementById('form-price').value = p.price;
+                document.getElementById('form-stock').value = p.stock;
+                document.getElementById('form-description').value = p.description || '';
+
+                modalTitle.textContent = `Edit Produk #${p.id}`;
+                modalAlert.style.display = 'none';
+                modal.style.display = 'flex';
+            }
+        } catch (err) {
+            alert('Gagal mengambil data produk.');
+        }
+    };
+
+    // Delete Product Trigger (Fetch DELETE)
+    window.deleteProduct = async (id) => {
+        if (!confirm(`Apakah Anda yakin ingin menghapus produk ID #${id}?`)) return;
+
+        try {
+            const res = await fetch(`/api/products/${id}`, {
+                method: 'DELETE'
+            });
+            const result = await res.json();
+
+            if (res.ok && result.status === 'success') {
+                loadProducts();
+            } else {
+                alert(result.message || 'Gagal menghapus produk.');
+            }
+        } catch (err) {
+            alert('Terjadi kesalahan server saat menghapus produk.');
+        }
+    };
+
+    // Save Form (Create via POST / Update via PUT)
+    productForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('product-id').value;
+        const name = document.getElementById('form-name').value.trim();
+        const category = document.getElementById('form-category').value.trim();
+        const price = document.getElementById('form-price').value;
+        const stock = document.getElementById('form-stock').value;
+        const description = document.getElementById('form-description').value.trim();
+
+        if (!name || !category || price === '' || stock === '') {
+            modalAlert.style.display = 'block';
+            modalAlert.textContent = 'Semua field bertanda bintang (*) wajib diisi!';
+            return;
+        }
+
+        const payload = { name, category, price, stock, description };
+        const isEdit = !!id;
+        const url = isEdit ? `/api/products/${id}` : '/api/products';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.status === 'success') {
+                closeModal();
+                loadProducts();
+            } else {
+                modalAlert.style.display = 'block';
+                modalAlert.textContent = result.message || 'Gagal menyimpan produk.';
+            }
+        } catch (err) {
+            modalAlert.style.display = 'block';
+            modalAlert.textContent = 'Terjadi kesalahan koneksi server.';
+        }
+    });
+
+    // Initial Load Data Table
+    loadProducts();
+});
+</script>
+
+<%- include('partials/footer') %>

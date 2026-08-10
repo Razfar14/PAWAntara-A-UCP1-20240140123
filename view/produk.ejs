@@ -5,13 +5,13 @@
     <header class="filter-header">
         <div>
             <h1 class="section-title" style="margin-bottom: 0.25rem;">Katalog Sembako</h1>
-            <p style="color: var(--slate-500); font-size: 0.875rem;">Daftar produk lengkap Toko Ibu Aries</p>
+            <p style="color: var(--slate-500); font-size: 0.875rem;">Daftar kebutuhan pokok segar & berkualitas</p>
         </div>
 
-        <!-- Form Filter Query Server-Side (req.query) -->
-        <form action="/produk" method="GET" class="filter-form">
-            <input type="text" name="search" value="<%= searchQuery %>" placeholder="Cari produk..." class="filter-input">
-            <select name="kategori" class="filter-select">
+        <!-- Form Filter Query -->
+        <form id="filter-form" action="/produk" method="GET" class="filter-form">
+            <input type="text" id="search-input" name="search" value="<%= searchQuery %>" placeholder="Cari produk..." class="filter-input">
+            <select id="category-select" name="kategori" class="filter-select">
                 <option value="">Semua Kategori</option>
                 <% categories.forEach(cat => { %>
                     <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
@@ -21,20 +21,77 @@
         </form>
     </header>
 
-    <div class="product-grid">
-        <% products.forEach(product => { %>
-            <article class="product-card">
-                <img src="<%= product.image || 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' %>" alt="<%= product.name %>" class="product-image">
-                <span class="category-badge"><%= product.category %></span>
-                <h2 class="product-name"><%= product.name %></h2>
-                <p class="product-desc"><%= product.description || 'Produk sembako kualitas terbaik.' %></p>
-                <div class="product-card-footer">
-                    <span class="product-price">Rp <%= product.price.toLocaleString('id-ID') %></span>
-                    <a href="/produk/<%= product.id %>" class="btn-detail">Detail</a>
-                </div>
-            </article>
-        <% }); %>
+    <!-- Product Grid yang di-render secara DINAMIS via GET /api/products -->
+    <div id="product-list" class="product-grid">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--slate-500);">
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+            <p>Memuat data produk sembako terbaru dari API...</p>
+        </div>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const productList = document.getElementById('product-list');
+
+    // Mengambil query params dari URL browser
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search') || '';
+    const kategori = urlParams.get('kategori') || '';
+
+    // Panggil GET /api/products secara dinamis via Fetch API
+    try {
+        let apiUrl = '/api/products';
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (kategori) params.append('kategori', kategori);
+        if (params.toString()) apiUrl += `?${params.toString()}`;
+
+        const response = await fetch(apiUrl);
+        const result = await response.json();
+
+        if (result.status === 'success' && result.data) {
+            renderProducts(result.data);
+        } else {
+            renderEmpty();
+        }
+    } catch (err) {
+        productList.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #dc2626;">
+                <p>Gagal memuat produk dari REST API server.</p>
+            </div>
+        `;
+    }
+
+    function renderProducts(products) {
+        if (products.length === 0) {
+            renderEmpty();
+            return;
+        }
+
+        productList.innerHTML = products.map(product => `
+            <article class="product-card">
+                <span class="category-badge" style="align-self: flex-start;">${product.category}</span>
+                <h2 class="product-name" style="text-transform: capitalize;">${product.name}</h2>
+                <p class="product-desc">${product.description || 'Produk sembako berkualitas super.'}</p>
+                <div class="product-card-footer">
+                    <span class="product-price">Rp ${product.price.toLocaleString('id-ID')}</span>
+                    <a href="/produk/${product.id}" class="btn-detail">Detail</a>
+                </div>
+            </article>
+        `).join('');
+    }
+
+    function renderEmpty() {
+        productList.innerHTML = `
+            <div style="grid-column: 1 / -1; background: #fff; border: 1px solid var(--slate-200); border-radius: 1rem; padding: 3rem; text-align: center;">
+                <h3 style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">Produk Tidak Ditemukan</h3>
+                <p style="color: var(--slate-500); font-size: 0.875rem; margin-bottom: 1.25rem;">Tidak ada produk yang cocok dengan pencarian atau filter Anda.</p>
+                <a href="/produk" class="btn-emerald">Reset Filter</a>
+            </div>
+        `;
+    }
+});
+</script>
 
 <%- include('partials/footer') %>

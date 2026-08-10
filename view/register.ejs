@@ -1,0 +1,126 @@
+<%- include('partials/header', { title: 'Registrasi Akun Baru - Toko Sembako Ibu Aries' }) %>
+<%- include('partials/navbar') %>
+
+<main class="container product-section">
+    <section style="background-color: #ffffff; border: 1px solid var(--slate-200); border-radius: 1rem; padding: 2.5rem; max-width: 28rem; margin: 2rem auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="width: 3.5rem; height: 3.5rem; background-color: var(--slate-100); color: var(--emerald-600); border-radius: 1rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-size: 1.5rem;">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h1 class="section-title" style="margin-bottom: 0.25rem;">Registrasi Akun</h1>
+            <p style="color: var(--slate-500); font-size: 0.85rem;">Buat akun baru untuk mengakses fitur toko</p>
+        </div>
+
+        <div id="alert-box" style="display: none; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
+
+        <form id="register-form" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label for="username" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--slate-700); margin-bottom: 0.35rem;">
+                    Username
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Masukkan username" 
+                    required
+                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--slate-200); border-radius: 0.5rem; font-size: 0.875rem; outline: none;"
+                >
+            </div>
+
+            <div>
+                <label for="email" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--slate-700); margin-bottom: 0.35rem;">
+                    Email (Opsional)
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="contoh@email.com" 
+                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--slate-200); border-radius: 0.5rem; font-size: 0.875rem; outline: none;"
+                >
+            </div>
+
+            <div>
+                <label for="password" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--slate-700); margin-bottom: 0.35rem;">
+                    Password
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Masukkan password" 
+                    required
+                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--slate-200); border-radius: 0.5rem; font-size: 0.875rem; outline: none;"
+                >
+            </div>
+
+            <!-- Role publik diset secara otomatis sebagai Pelanggan / Customer -->
+
+            <button type="submit" class="btn-emerald" style="width: 100%; padding: 0.75rem; margin-top: 0.5rem; font-size: 0.9rem;">
+                Daftar Sekarang
+            </button>
+        </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--slate-100); text-align: center; font-size: 0.85rem; color: var(--slate-600);">
+            Sudah memiliki akun? <a href="/login" style="color: var(--emerald-600); font-weight: 600; text-decoration: none;">Login di sini</a>
+        </div>
+    </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.getElementById('register-form');
+    const alertBox = document.getElementById('alert-box');
+
+    const showAlert = (message, isSuccess = false) => {
+        alertBox.style.display = 'block';
+        alertBox.textContent = message;
+        if (isSuccess) {
+            alertBox.style.backgroundColor = '#ecfdf5';
+            alertBox.style.borderColor = '#a7f3d0';
+            alertBox.style.color = '#047857';
+        } else {
+            alertBox.style.backgroundColor = '#fef2f2';
+            alertBox.style.borderColor = '#fecaca';
+            alertBox.style.color = '#dc2626';
+        }
+    };
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) {
+            showAlert('Username dan Password wajib diisi!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
+                showAlert(data.message + ' Mengalihkan ke halaman login...', true);
+                setTimeout(() => {
+                    window.location.href = data.redirectUrl || '/login';
+                }, 1500);
+            } else {
+                showAlert(data.message || 'Registrasi gagal.');
+            }
+        } catch (err) {
+            showAlert('Terjadi kesalahan koneksi ke server.');
+        }
+    });
+});
+</script>
+
+<%- include('partials/footer') %>
