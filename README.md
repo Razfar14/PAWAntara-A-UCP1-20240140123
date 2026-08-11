@@ -13,21 +13,29 @@ Cara menjalankan project secara lokal:
 4. Jalankan Server (npm start)
 
 Daftar endpoint API beserta method:
+<br>
 1.POST /api/register
   Mendaftarkan akun pengguna/pelanggan baru.
+<br>
 2.POST /api/login
   Melakukan autentikasi pengguna dan membuat session login.
+<br>
 3.GET /api/products
   Mengambil seluruh daftar produk. Mendukung query parameter kategori dan search.
+<br>
 4.GET /api/products/:id
   Mengambil detail informasi satu produk berdasarkan ID.
+<br>
 5.POST /api/products (Protected)
   Menambahkan produk sembako baru ke database (Memerlukan session login).
-7.PUT /api/products/:id (Protected)
+<br>
+6.PUT /api/products/:id (Protected)
   Memperbarui data, harga, atau stok produk berdasarkan ID (Memerlukan session login).
-8.DELETE /api/products/:id (Protected)
+<br>
+7.DELETE /api/products/:id (Protected)
   Menghapus data produk dari database berdasarkan ID (Memerlukan session login).
-9.POST /api/chat
+<br>
+8.POST /api/chat
   Mengirimkan pertanyaan pelanggan ke backend Tanya AI dan menerima balasan otomatis seputar operasional toko.
 
 tampilan(ui) dan deskripsinya": 
